@@ -5,7 +5,7 @@ const aliasesCO = ['co', 'colombia', 'col']
 
 let handler = async (m, { conn, args }) => {
   if (args.length === 0) {
-    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬' })
+    await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 ❇️' })
     return
   }
 
@@ -73,37 +73,35 @@ let handler = async (m, { conn, args }) => {
     colText
   }
 }
-
 handler.help = ['6vs6']
 handler.tags = ['freefire']
 handler.command = /^\.?(6vs6|vs6)$/i
 handler.group = true
-
 export default handler
 
 function generarVersus(escuadra, suplentes, mexText = '  ', colText = '  ') {
   function formatEscuadra(arr) {
     let out = ''
     for (let i = 0; i < 6; i++) { // máximo 6 jugadores
-      let icon = i === 0 ? '👑' : '🎮'
+      let icon = i === 0 ? '👑' : '🧑🏾‍💻'
       out += arr[i] ? `${icon} ┇ @${arr[i].split('@')[0]}\n` : `${icon} ┇ \n`
     }
-    return out.trimEnd() || '─ ┇ Sin jugadores'
+    return out.trimEnd()
   }
 
   function formatSuplentes(arr) {
     let out = ''
-    for (let i = 0; i < 2; i++) { // suplentes (ajústalo si quieres)
-      out += arr[i] ? `🎮 ┇ @${arr[i].split('@')[0]}\n` : `🎮 ┇ \n`
+    for (let i = 0; i < 2; i++) {
+      out += arr[i] ? `🧑🏾‍💻 ┇ @${arr[i].split('@')[0]}\n` : `🧑🏾‍💻 ┇ \n`
     }
-    return out.trimEnd() || '─ ┇ Sin suplentes'
+    return out.trimEnd()
   }
 
-  return `*𝟔 𝐕𝐄𝐑𝐒𝐔𝐒 𝟔*
+  return `*6 𝐕𝐒 6*
 
 *𝐇𝐎𝐑𝐀𝐑𝐈𝐎𝐒*;
-*🇲🇽 MEXICO* : ${mexText}
-*🇨🇴 COLOMBIA* : ${colText}
+🇲🇽 *MEXICO* : ${mexText}
+🇨🇴 *COLOMBIA* : ${colText}
 
 *𝐉𝐔𝐆𝐀𝐃𝐎𝐑𝐄𝐒 𝐏𝐑𝐄𝐒𝐄𝐍𝐓𝐄𝐒*;
 
@@ -146,13 +144,12 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     } catch {}
 
     if (emoji === '❌' && isAdmin) {
+      const hasPlayers = data.escuadra.length + data.suplentes.length > 0
+      if (!hasPlayers) continue
       data.escuadra = []
       data.suplentes = []
-
       let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-
       try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
-
       let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
       delete versusData[msgID]
       versusData[sent.key.id] = data
