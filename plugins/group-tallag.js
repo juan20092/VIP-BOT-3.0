@@ -6,16 +6,16 @@ const handler = async (m, { conn, participants, groupMetadata }) => {
     groupMetadata?.subject ||
     (m?.chat ? `Grupo` : `Chat`);
 
-  const titulo = `*╭─〔 𝙈𝙀𝙉𝘾𝙄𝙊́𝙉 𝙂𝙀𝙉𝙀𝙍𝘼𝙇 〕─╮*`;
+  const titulo = `*╭〔 𝙈𝙀𝙉𝘾𝙄𝙊́𝙉 𝙂𝙀𝙉𝙀𝙍𝘼𝙇 〕╮*`;
   const subtitulo = `*│* *${groupName}*`;
   const info = `*│* *Para ${total} miembros*  ❤️`;
-  const separador = `*╰──────────────────╯*\n`;
+  const separador = `*╰───────────╯*\n`;
 
   // Menciones en formato bonito (en columnas)
   const lines = participants.map((u, i) => {
     const numero = (u.id || '').split('@')[0];
-    const idx = String(i + 1).padStart(2, '0');
-    return `*${idx}.* @${numero}`;
+    // Cambia el número por el emoji ❤️
+    return `❤️ @${numero}`;
   });
 
   // (Opcional) divide el bloque para que no se vea eterno en grupos grandes
