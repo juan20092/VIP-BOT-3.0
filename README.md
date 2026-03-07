@@ -32,8 +32,7 @@
 
 ## Contacto y soporte
 
-- 𝐃𝐞𝐬𝐚𝐫𝐫𝐨𝐥𝐥𝐚𝐝𝐨𝐫: 𝑬𝒍𝒊𝒖𝒅
-- 𝐂𝐡𝐚𝐧𝐧𝐞𝐥: [VIP-BOT](https://files.catbox.moe/gx1ipj.jpg)
+- 𝐃𝐞𝐬𝐚𝐫𝐫𝐨𝐥𝐥𝐚𝐝𝐨𝐫: 𝑱𝒖𝒂𝒏
 
 ---
 
