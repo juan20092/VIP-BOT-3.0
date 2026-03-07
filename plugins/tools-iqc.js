@@ -2,7 +2,7 @@ let handler = async (m, { conn, text}) => {
   if (!text) return m.reply('📌 Ejemplo de uso:\n.iqc Pollo frito con papas')
 
   let hora = new Intl.DateTimeFormat('es-ES', {
-    timeZone: 'America/colombia', // Puedes ajustarlo a tu zona
+    timeZone: 'America/Caracas', // Puedes ajustarlo a tu zona
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
