@@ -23,22 +23,14 @@ const handler = async (m, { conn, usedPrefix }) => {
 
     // Puedes cambiar estos videos por los de tu preferencia o los que usas normalmente.
     const videos = [
-      'https://cdn.russellxz.click/9d546d53.mp4',
+      'https://n.uguu.se/BbJoVVRF.mp4',
     ]
     let video = videos[Math.floor(Math.random() * videos.length)]
 
     // banner, botname, dev, channelRD son variables que deben existir en tu contexto/bot principal
     // Si no existen, puedes sustituirlas, inicializarlas aquí o arriba, o poner valores por defecto
 
-    let menuText =  `╔════🔪════╗
-   🔪 𝐕 𝐈 𝐏  -  𝐁 𝐎 𝐓 🔪
-╚════🔪════╝
-         ▄︻デ══━一⁠
-
-╭──────────╮
-     🔪 𝐶𝑂𝑀𝐴𝑁𝐷𝑂𝑆
-      𝐷𝐼𝑆𝑃𝑂𝑁𝐼𝐵𝐿𝐸𝑆 🔪
-╰──────────╯
+    let menuText =  `🪙 𝐌 𝐔 𝐋 𝐓 𝐈 - 𝐌 𝐄 𝐍 𝐔́ 
 
 ・✧「 𝗙𝗥𝗘𝗙𝗜𝗥𝗘 💣 」
 ┃
@@ -79,6 +71,7 @@ const handler = async (m, { conn, usedPrefix }) => {
 ・✧「 ⬇️ 𝗗𝗘𝗦𝗖𝗔𝗥𝗚𝗔𝗦 」
 ┃
 ✩  ꯭🎶˙⋆｡.𝗽𝗹𝗮𝘆 
+✩  ꯭🎶˙⋆｡.𝘀𝗽𝗼𝘁𝗶𝗳𝘆 
 ┃
 ✧・―・―・―・―・✧
 
@@ -155,8 +148,9 @@ const handler = async (m, { conn, usedPrefix }) => {
     await conn.sendMessage(
       m.chat,
       {
-        image: { url: 'https://files.catbox.moe/gx1ipj.jpg' },
+        video: { url: 'https://n.uguu.se/BbJoVVRF.mp4' },
         caption: menuText,
+        gifPlayback: true,
         contextInfo: {
           mentionedJid: [m.sender],
           isForwarded: true,
