@@ -1,7 +1,7 @@
 import { WAMessageStubType } from '@whiskeysockets/baileys'
 import fetch from 'node-fetch'
 
-const DEFAULT_PP = 'https://cdn.russellxz.click/c7839340.jpg'
+const DEFAULT_PP = 'https://files.catbox.moe/gx1ipj.jpg'
 
 async function safeFetchBuffer(url) {
   try {
@@ -73,7 +73,7 @@ export async function before(m, ctx) {
       caption = applyTemplate(
         chat.sWelcome,
         vars,
-        'Bienvenido/a ' + user +
+        '👋 Bienvenido/a ' + user +
           '\nLe damos una cordial bienvenida al grupo: *' + group + '*.' +
           '\n\n⚠️ Descripción del grupo:\n' + desc
       )
