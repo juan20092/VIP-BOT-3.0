@@ -1,86 +1,55 @@
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 
-let handler = async (m, { conn, text, usedPrefix }) => {
+let handler = async (m, { conn, text, args }) => {
   if (!text) {
-    return conn.reply(m.chat, 
-`> ⓘ USO INCORRECTO
-
-> ❌ Debes proporcionar el nombre de la canción
-
-> 📝 Ejemplos:
-> • ${usedPrefix}play nombre de la canción
-> • ${usedPrefix}play artista canción`, m)
+    return m.reply("🍃 Ingresa el texto de lo que quieres buscar")
   }
 
+  let ytres = await search(args.join(" "))
+  if (!ytres.length) {
+    return m.reply("🍃 No se encontraron resultados para tu búsqueda.")
+  }
+
+  let izumi = ytres[0]
+  let txt = `🎬 *Título*: ${izumi.title}
+⏱️ *Duración*: ${izumi.timestamp}
+📅 *Publicado*: ${izumi.ago}
+📺 *Canal*: ${izumi.author.name || 'Desconocido'}
+🔗 *Url*: ${izumi.url}`
+  await conn.sendFile(m.chat, izumi.image, 'thumbnail.jpg', txt, m)
+
   try {
-    await conn.sendMessage(m.chat, { react: { text: '🕑', key: m.key } })
+    const videoId = izumi.url.split('v=')[1]?.split('&')[0] || izumi.url.split('/').pop()
+    const apiUrl = `https://nex-magical.vercel.app/download/y?url=https%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3D${videoId}`
+    const response = await fetch(apiUrl)
+    const data = await response.json()
 
-    const search = await yts(text)
-    if (!search.videos.length) throw new Error('No encontré resultados')
-
-    const video = search.videos[0]
-    const { title, url, thumbnail, author, duration, views } = video
-
-    let thumbBuffer = null
-    if (thumbnail) {
-      try {
-        const resp = await fetch(thumbnail)
-        const arrayBuffer = await resp.arrayBuffer()
-        thumbBuffer = Buffer.from(arrayBuffer)
-      } catch {}
+    if (data.status !== true || !data.result.url) {
+      throw new Error('Fallo al obtener el audio. JSON inesperado')
     }
 
-    // Enviar información de la música con imagen
-    await conn.sendMessage(
-      m.chat,
-      {
-        image: thumbBuffer,
-        caption: `🎵 *${title}*\n👤 *Artista:* ${author?.name || 'Desconocido'}\n⏱️ *Duración:* ${duration || 'N/A'}\n👁️ *Vistas:* ${views || 'N/A'}\n🔗 [Ver en YouTube](${url})`,
-      },
-      { quoted: m }
-    )
-
-    
-    const apiB64 = 'aHR0cHM6Ly9zbWFzYWNoaWthLmFseWFib3QueHl6L2Rvd25sb2FkX2F1ZGlvP3VybD0='
-    const endpoint = Buffer.from(apiB64, 'base64').toString('utf-8') + encodeURIComponent(url)
-
-    const response = await fetch(endpoint)
-    if (!response.ok) throw new Error('Error en la respuesta del servidor')
-
-    const data = await response.json()
-    const audioUrl = data?.file_url 
-    
-    if (!audioUrl) throw new Error('La API no devolvió un enlace de descarga válido')
+    const { title, url } = data.result
 
     await conn.sendMessage(
       m.chat,
       {
-        audio: { url: audioUrl },
+        audio: { url: url },
         mimetype: 'audio/mpeg',
-        ptt: false,
-        jpegThumbnail: thumbBuffer,
-        fileName: `${title}.mp3`
+        fileName: `${title || izumi.title}.mp3`
       },
       { quoted: m }
     )
-
-    await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
-
-  } catch (e) {
-    await conn.reply(m.chat, 
-`> ⓘ ERROR
-
-> ❌ ${e.message}
-
-> 💡 Intenta con otro nombre o más tarde`, m)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
+  } catch (error) {
+    console.error(error)
+    m.reply(`❌ Lo siento, no pude descargar el audio.\n${error.message}`)
   }
 }
 
-handler.help = ['play']
-handler.tags = ['downloader']
-handler.command = ['play']
-handler.group = true
-
+handler.command = /^(play)$/i
 export default handler
+
+async function search(query, options = {}) {
+  let result = await yts.search({ query, hl: "es", gl: "ES", ...options })
+  return result.videos || []
+}
