@@ -227,8 +227,3 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
     versusData[sent.key.id] = data
   }
 })
-
-    delete versusData[msgID]
-    versusData[sent.key.id] = data
-  }
-})
