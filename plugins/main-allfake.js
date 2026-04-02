@@ -94,7 +94,7 @@ handler.all = async function (m, { conn }) {
 
   // Imágenes random
   const imgs = [
-    'https://api.dix.lat/media2/1775096628366.jpg'
+    'https://files.catbox.moe/28rxrs.jpg'
   ]
   global.img = pickRandom(imgs)
 
