@@ -91,7 +91,7 @@ const handler = async (m, { conn, participants }) => {
 
   const userText = content.trim().replace(/^\.?n(\s|$)/i, '');
   const originalCaption = (q.msg?.caption || q.text || '').trim();
-  const watermark = '> 𝐕𝐈𝐏 𝐁𝐎𝐓 ❤️';
+  const watermark = '> 𝐕𝐈𝐏 𝐁𝐎𝐓 🗡️';
   const finalCaption = userText ? `${userText}\n\n${watermark}` : 
                         originalCaption ? `${originalCaption}\n\n${watermark}` : 
                         watermark;
