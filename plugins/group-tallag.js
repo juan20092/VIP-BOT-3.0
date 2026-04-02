@@ -28,7 +28,7 @@ const handler = async (m, { isOwner, isAdmin, conn, args, participants }) => {
 
   // Envía la imagen con el texto y menciones
   await conn.sendMessage(m.chat, {
-    image: { url: 'https://files.catbox.moe/m8562b.jpg' },
+    image: { url: 'https://api.dix.lat/media2/1775096396469.jpg' },
     caption: mentionText,
     gifPlayback: true,
     mentions: participants.map(a => a.id)
