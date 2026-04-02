@@ -1,51 +1,42 @@
-const handler = async (m, { conn, participants, groupMetadata }) => {
+const handler = async (m, { isOwner, isAdmin, conn, args, participants }) => {
+  // Verifica permisos
+  let canal = (typeof rcanal !== 'undefined') ? rcanal : (global.rcanal || '');
+  if (!(isAdmin || isOwner)) {
+    global.dfail('admin', m, canal, conn);
+    throw false;
+  }
+
+  // Obtiene datos del grupo
+  const pesan = args.join(' ');
+  const groupMetadata = await conn.groupMetadata(m.chat);
+  const groupName = groupMetadata.subject;
   const total = participants.length;
 
-  // Nombre del grupo (si está disponible)
-  const groupName =
-    groupMetadata?.subject ||
-    (m?.chat ? `Grupo` : `Chat`);
+  // Reacciona al mensaje
+  await conn.sendMessage(m.chat, { react: { text: '🔪', key: m.key } });
 
-  const titulo = `*╭〔 𝙈𝙀𝙉𝘾𝙄𝙊́𝙉 𝙂𝙀𝙉𝙀𝙍𝘼𝙇 〕╮*`;
-  const subtitulo = `*│* *${groupName}*`;
-  const info = `*│* *Para ${total} miembros*  🌟`;
-  const separador = `*╰───────────╯*\n`;
+  // Construye el texto de mención con formato de columna
+  let mentionText = '';
+  mentionText += '┏━━━━━━━━━━━┓\n';
+  mentionText += `┃  🛸 𝖦𝗋𝗎𝗉𝗈: ${groupName}\n`;
+  mentionText += `┃  👥 𝖬𝗂𝖾𝗆𝖻𝗋𝗈𝗌: ${total}\n`;
+  mentionText += '┗━━━━━━━━━━━┛\n';
+  if (pesan) mentionText += `${pesan}\n`;
+  mentionText += '┌──⭓ *Despierten*\n';
+  mentionText += participants.map(mem => `🍷 @${mem.id.split('@')[0]}`).join('\n');
+  mentionText += '\n└───────⭓\n\n𝘚𝘶𝘱𝘦𝘳 𝘉𝘰𝘵 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱 🔪';
 
-  // Menciones en formato bonito (en columnas)
-  const lines = participants.map((u, i) => {
-    const numero = (u.id || '').split('@')[0];
-    // Cambia el número por el emoji ❤️
-    return `➤ 🌟 @${numero}`;
-  });
-
-  // (Opcional) divide el bloque para que no se vea eterno en grupos grandes
-  const chunkSize = 35; // ajusta si quieres
-  const chunks = [];
-  for (let i = 0; i < lines.length; i += chunkSize) {
-    chunks.push(lines.slice(i, i + chunkSize).join('\n'));
-  }
-
-  await conn.sendMessage(m.chat, { react: { text: '🌟', key: m.key } });
-
-  for (let i = 0; i < chunks.length; i++) {
-    const header =
-      `${titulo}\n${subtitulo}\n${info}\n${separador}` +
-      (chunks.length > 1 ? `*Parte ${i + 1}/${chunks.length}*\n\n` : `\n`);
-
-    await conn.sendMessage(
-      m.chat,
-      {
-        text: header + chunks[i],
-        mentions: participants.map(p => p.id)
-      },
-      { quoted: m }
-    );
-  }
+  // Envía la imagen con el texto y menciones
+  await conn.sendMessage(m.chat, {
+    image: { url: 'https://files.catbox.moe/m8562b.jpg' },
+    caption: mentionText,
+    gifPlayback: true,
+    mentions: participants.map(a => a.id)
+  }, { quoted: m });
 };
 
-handler.customPrefix = /^\.?(todos|all|tagall)$/i;
+handler.customPrefix = /^\.?todos$/i;
 handler.command = new RegExp();
 handler.group = true;
 handler.admin = true;
-
 export default handler;
