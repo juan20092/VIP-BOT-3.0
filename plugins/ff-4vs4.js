@@ -1,9 +1,12 @@
 let versusData = {}
+let isReactionHandlerRegistered = false
 
 const aliasesMX = ['mx', 'méxico', 'mexico', 'méx', 'mex']
 const aliasesCO = ['co', 'colombia', 'col']
 
 let handler = async (m, { conn, args }) => {
+  registerReactionHandler(conn)
+
   if (args.length === 0) {
     await conn.sendMessage(m.chat, { text: '𝐓𝐢𝐞𝐧𝐞𝐬 𝐪𝐮𝐞 𝐞𝐬𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐫 𝐥𝐚 𝐡𝐨𝐫𝐚 𝐲 𝐞𝐥 𝐩𝐚𝐢́𝐬 ❇️' })
     return
@@ -121,59 +124,69 @@ ${formatSuplentes(suplentes)}
 `
 }
 
-conn.ev.on('messages.upsert', async ({ messages }) => {
-  for (let msg of messages) {
-    if (!msg.message?.reactionMessage) continue
-    let msgID = msg.message.reactionMessage.key.id
-    let data = versusData[msgID]
-    if (!data) continue
+function registerReactionHandler(conn) {
+  if (isReactionHandlerRegistered) return
+  isReactionHandlerRegistered = true
 
-    let user = msg.key.participant || msg.key.remoteJid
-    let emoji = msg.message.reactionMessage.text
-    const isInAnyList =
-      data.escuadra.includes(user) ||
-      data.suplentes.includes(user)
+  conn.ev.on('messages.upsert', async ({ messages }) => {
+    for (let msg of messages) {
+      if (!msg.message?.reactionMessage) continue
 
-    if (emoji === '👎' && !isInAnyList) continue
+      let msgID = msg.message.reactionMessage.key.id
+      let data = versusData[msgID]
+      if (!data) continue
 
-    let isAdmin = false
-    try {
-      let groupMetadata = await conn.groupMetadata(data.chat)
-      let participant = groupMetadata.participants.find(p => p.id === user)
-      isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
-    } catch {}
+      let user = msg.key.participant || msg.key.remoteJid
+      let emoji = normalizeReaction(msg.message.reactionMessage.text)
+      const isInAnyList =
+        data.escuadra.includes(user) ||
+        data.suplentes.includes(user)
 
-    if (emoji === '❌' && isAdmin) {
-      data.escuadra = []
-      data.suplentes = []
+      if (emoji === '👎' && !isInAnyList) continue
 
-      // Texto de lista vacía visible
+      let isAdmin = false
+      try {
+        let groupMetadata = await conn.groupMetadata(data.chat)
+        let participant = groupMetadata.participants.find((participantData) => participantData.id === user)
+        isAdmin = participant?.admin === 'admin' || participant?.admin === 'superadmin'
+      } catch {}
+
+      if (emoji === '❌' && isAdmin) {
+        data.escuadra = []
+        data.suplentes = []
+
+        let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
+
+        try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
+
+        let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
+        delete versusData[msgID]
+        versusData[sent.key.id] = data
+        continue
+      }
+
+      data.escuadra = data.escuadra.filter((listedUser) => listedUser !== user)
+      data.suplentes = data.suplentes.filter((listedUser) => listedUser !== user)
+
+      if (emoji === '❤') {
+        if (data.escuadra.length < 4) data.escuadra.push(user)
+      } else if (emoji === '👍') {
+        if (data.suplentes.length < 2) data.suplentes.push(user)
+      } else if (emoji === '👎') {
+      } else {
+        continue
+      }
+
       let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-
-      // Borrar mensaje original
+      let mentions = [...data.escuadra, ...data.suplentes]
       try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
-
-      let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions: [] })
+      let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
       delete versusData[msgID]
       versusData[sent.key.id] = data
-      continue
     }
+  })
+}
 
-    data.escuadra = data.escuadra.filter(u => u !== user)
-    data.suplentes = data.suplentes.filter(u => u !== user)
-
-    if (emoji === '❤️') {
-      if (data.escuadra.length < 4) data.escuadra.push(user)
-    } else if (emoji === '👍') {
-      if (data.suplentes.length < 2) data.suplentes.push(user)
-    } else if (emoji === '👎') {
-    } else continue
-
-    let nuevoTexto = generarVersus(data.escuadra, data.suplentes, data.mexText, data.colText)
-    let mentions = [...data.escuadra, ...data.suplentes]
-    try { await conn.sendMessage(data.chat, { delete: msg.message.reactionMessage.key }) } catch {}
-    let sent = await conn.sendMessage(data.chat, { text: nuevoTexto, mentions })
-    delete versusData[msgID]
-    versusData[sent.key.id] = data
-  }
-})
+function normalizeReaction(emoji = '') {
+  return emoji.trim().replace(/\uFE0F/g, '')
+}
