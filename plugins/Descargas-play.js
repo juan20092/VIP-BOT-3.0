@@ -1,33 +1,43 @@
 import fetch from 'node-fetch'
 import yts from 'yt-search'
 
-const APIKEY = 'NEX-84A545EA503045EABFE70480' // <-- tu key
+const APIKEY = 'NEX-84A545EA503045EABFE70480' 
 
 let handler = async (m, { conn, text, args }) => {
   try {
     const query = (text || args.join(' ')).trim()
     if (!query) return m.reply('🍃 Ingresa el texto de lo que quieres buscar')
 
-    const ytres = await search(query)
-    if (!ytres.length) return m.reply('🍃 No se encontraron resultados para tu búsqueda.')
+    let izumi = null
+    let youtubeUrl = null
 
-    const izumi = ytres[0]
+    if (isYouTubeUrl(query)) {
+      const videoId = extractVideoId(query)
+      if (!videoId) return m.reply('❌ No pude leer el enlace de YouTube.')
+      youtubeUrl = `https://youtu.be/${videoId}`
 
-    const info = `🎬 *Título*: ${izumi.title}
-⏱️ *Duración*: ${izumi.timestamp || '??:??'}
-📅 *Publicado*: ${izumi.ago || 'Desconocido'}
-📺 *Canal*: ${izumi.author?.name || izumi.author || 'Desconocido'}
-🔗 *Url*: ${izumi.url}`
+      const ytres = await search(videoId)
+      if (ytres.length) izumi = ytres[0]
+    } else {
+      const ytres = await search(query)
+      if (!ytres.length) return m.reply('🍃 No se encontraron resultados para tu búsqueda.')
+      izumi = ytres[0]
 
-    await conn.sendFile(m.chat, izumi.image, 'thumbnail.jpg', info, m)
+      const videoId = extractVideoId(izumi.url)
+      if (!videoId) throw new Error('No pude obtener el ID del video.')
+      youtubeUrl = `https://youtu.be/${videoId}`
+    }
 
-    // ID / URL normalizada
-    const videoId = extractVideoId(izumi.url)
-    if (!videoId) throw new Error('No pude obtener el ID del video.')
+    const info = `🎬 *Título*: ${izumi?.title || 'Audio de YouTube'}
+  ⏱️ *Duración*: ${izumi?.timestamp || '??:??'}
+  📅 *Publicado*: ${izumi?.ago || 'Desconocido'}
+  📺 *Canal*: ${izumi?.author?.name || izumi?.author || 'Desconocido'}
+  🔗 *Url*: ${izumi?.url || youtubeUrl}`
 
-    const youtubeUrl = `https://youtu.be/${videoId}`
+    if (izumi?.image) {
+      await conn.sendFile(m.chat, izumi.image, 'thumbnail.jpg', info, m)
+    }
 
-    // NUEVO endpoint
     const apiUrl =
       'https://nex-magical.vercel.app/download/audio?url=' +
       encodeURIComponent(youtubeUrl) +
@@ -45,22 +55,18 @@ let handler = async (m, { conn, text, args }) => {
 
     const data = await response.json()
 
-    // Según tu JSON de ejemplo:
-    // data.status === true
-    // data.result.status === true
-    // data.result.url => link directo al mp3
-    const ok = data?.status === true && data?.result?.status === true
-    const audioUrl = data?.result?.url
+
+    const ok = data?.status === true && data?.result?.status !== false
+    const audioUrl = data?.result?.url || data?.url
 
     if (!ok || !audioUrl) {
       throw new Error('Fallo al obtener el audio. JSON inesperado.')
     }
 
-    // El title puede venir null en result.info.title, así que hacemos fallback
     const title =
       data?.result?.info?.title ||
       data?.result?.title ||
-      izumi.title ||
+      izumi?.title ||
       'audio'
 
     const safeTitle = String(title).replace(/[\\/:*?"<>|]+/g, '').trim()
@@ -88,6 +94,10 @@ async function search(query, options = {}) {
   return result?.videos || []
 }
 
+function isYouTubeUrl(value = '') {
+  return /(?:youtube\.com|youtu\.be)/i.test(value)
+}
+
 function extractVideoId(url = '') {
   const vParam = url.match(/[?&]v=([^&]+)/)
   if (vParam?.[1]) return vParam[1]
@@ -101,3 +111,4 @@ function extractVideoId(url = '') {
   const parts = url.split('/').filter(Boolean)
   return parts.length ? parts[parts.length - 1].split('?')[0] : null
 }
+
