@@ -8,8 +8,7 @@ let handler = async (m, { conn, text }) => {
         // Mostramos que el bot está trabajando
         await m.react('⚪');
 
-        // URL directa con fondo blanco por defecto
-        const apiUrl = `https://sylphy.xyz/tools/brat?text=${encodeURIComponent(text)}&color=black&fondo=white&api_key=sylphy-6f150d`;
+        const apiUrl = `https://api.delirius.store/canvas/brat?text=${encodeURIComponent(text)}`;
         
         const response = await axios.get(apiUrl, { responseType: 'arraybuffer' });
         const buffer = response.data;
