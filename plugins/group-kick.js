@@ -15,8 +15,11 @@ var handler = async (m, { conn, participants, usedPrefix, command, rcanal }) => 
 	}
 }
 
-handler.customPrefix = /^\.?kick/i;
-handler.command = new RegExp();
-handler.group = true;
-handler.admin = true;
-export default handler;
+handler.help = ['kick']
+handler.tags = ['group']
+handler.command = ['kick', 'echar', 'hechar','sacar', 'ban']
+handler.admin = true
+handler.group = true
+handler.botAdmin = true
+
+export default handler
