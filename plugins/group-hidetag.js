@@ -2,7 +2,7 @@ import { generateWAMessageFromContent, downloadContentFromMessage } from '@whisk
 import fetch from 'node-fetch'
 
 let thumb = null
-fetch('https://files.catbox.moe/28rxrs.jpg')
+fetch('https://cdn.dix.lat/me/182b8d74-11e9-4f05-98ae-7140972e52f1.jpg')
   .then(r => r.arrayBuffer())
   .then(buf => thumb = Buffer.from(buf))
   .catch(() => null)
