@@ -2,7 +2,6 @@ import moment from 'moment-timezone'
 
 const handler = async (m, { conn, usedPrefix }) => {
   try {
-    // Datos previos necesarios (puedes declarar/obtener arriba si no existen en tu contexto)
     let userId = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender
     let userData = global.db?.data?.users?.[userId] || {}
     let exp = userData.exp || 0
@@ -20,15 +19,6 @@ const handler = async (m, { conn, usedPrefix }) => {
     let hora = new Date().toLocaleTimeString('es-PE', { timeZone: zona })
     let fecha = fechaObj.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: zona })
     let dia = fechaObj.toLocaleDateString('es-PE', { weekday: 'long', timeZone: zona })
-
-    // Puedes cambiar estos videos por los de tu preferencia o los que usas normalmente.
-    const videos = [
-      'https://api.dix.lat/media2/1775087333113.mp4',
-    ]
-    let video = videos[Math.floor(Math.random() * videos.length)]
-
-    // banner, botname, dev, channelRD son variables que deben existir en tu contexto/bot principal
-    // Si no existen, puedes sustituirlas, inicializarlas aquí o arriba, o poner valores por defecto
 
     let menuText =  `🪙 𝐌 𝐔 𝐋 𝐓 𝐈 - 𝐌 𝐄 𝐍 𝐔́ 
 
@@ -148,9 +138,8 @@ const handler = async (m, { conn, usedPrefix }) => {
     await conn.sendMessage(
       m.chat,
       {
-        video: { url: 'https://api.dix.lat/media2/1775087333113.mp4' },
+        image: { url: 'https://cdn.dix.lat/me/b06e63d2-bc0b-4c85-9f7a-eef09fc64f64.jpg' },
         caption: menuText,
-        gifPlayback: true,
         contextInfo: {
           mentionedJid: [m.sender],
           isForwarded: true,
