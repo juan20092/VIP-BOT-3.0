@@ -27,12 +27,9 @@
   "dependencies": {
     "@bochilteam/scraper": "^4.2.4",
     "@hapi/boom": "^10.0.1",
-    "@StarlightsTeam/Scraper": "github:Ado926/Starlights-Scraper",
     "@whiskeysockets/baileys": "^7.0.0-rc.13",
     "api-dylux": "^1.8.5",
-    "aptoide-scraper": "github:DIEGO-OFC/dv-aptoide-scraper",
-    "ruhend-scraper": "*",
-    "jimp": "^0.22.2",
+    "jimp": "^1.6.1",
     "@soymaycol/yt-dlp": "^1.0.1",
     "boxen": "^7.1.1",
     "awesome-phonenumber": "^3.4.0",
@@ -76,7 +73,6 @@
     "qrcode": "^1.5.1",
     "qrcode-terminal": "^0.12.0",
     "readline": "^1.3.0",
-    "sanzy-spotifydl": "*",
     "similarity": "^1.2.1",
     "socket.io": "^4.5.2",
     "syntax-error": "^1.4.0",
@@ -86,8 +82,7 @@
     "url-regex-safe": "^3.0.0",
     "ws": "^8.17.1",
     "yargs": "^17.6.0",
-    "yt-search": "^2.10.3",
-    "fluent-ffmpeg": "*"
+    "yt-search": "^2.10.3"
   },
   "optionalDependencies": {
     "moment-timezone": "^0.5.45"
